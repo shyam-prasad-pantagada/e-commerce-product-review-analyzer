@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-commerce Product Sentiment Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.8;
+            background: rgba(255,255,255,0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #2c3e50;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .tab.active {
+            background: #3498db;
+            border-bottom-color: #1abc9c;
+        }
+        
+        .content {
+            padding: 30px;
+            display: none;
+            min-height: 500px;
+        }
+        
+        .content.active {
+            display: block;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-viz {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+        }
+        
+        .btn-viz:hover {
+            box-shadow: 0 7px 14px rgba(155, 89, 182, 0.3);
+        }
+        
+        .btn-refresh {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+        }
+        
+        .btn-refresh:hover {
+            box-shadow: 0 7px 14px rgba(46, 204, 113, 0.3);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 25px;
+            border-radius: 12px;
+            color: white;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        
+        .stat-card.total { background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%); }
+        .stat-card.positive { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); }
+        .stat-card.negative { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
+        .stat-card.neutral { background: linear-gradient(135deg, #f39c12 0%, #d35400 100%); }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            min-height: 400px;
+        }
+        
+        .reviews-list {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 10px;
+        }
+        
+        .review-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .review-item:last-child {
+            border-bottom: none;
+        }
+        
+        .review-sentiment {
+            min-width: 100px;
+            text-align: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .review-positive { background: #2ecc71; }
+        .review-negative { background: #e74c3c; }
+        .review-neutral { background: #f39c12; }
+        
+        .review-text {
+            flex: 1;
+            color: #2c3e50;
+            line-height: 1.5;
+        }
+        
+        .review-rating {
+            background: #3498db;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .review-category {
+            background: #ecf0f1;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-size: 18px;
+        }
+        
+        .loading:after {
+            content: '...';
+            animation: dots 1.5s infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        
+        .product-selector {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+            margin-bottom: 20px;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .viz-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #2c3e50;
+            color: white;
+            margin-top: 30px;
+            border-radius: 0 0 20px 20px;
+        }
+        
+        @media (max-width: 992px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .product-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                text-align: left;
+                padding: 12px;
+            }
+            
+            .viz-controls {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span>📊</span>
+                E-commerce Product Sentiment Analyzer
+            </div>
+            <div class="tagline">
+                Analyze customer reviews and sentiment for any product
+            </div>
+            <div class="subtitle">
+                Ratings Scale: 1-5 Stars | Dataset: 1000+ Reviews | Real-time Analysis
+            </div>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('analyze')">🔍 Product Analysis</button>
+            <button class="tab" onclick="switchTab('visualize')">📈 Visualization</button>
+            <button class="tab" onclick="switchTab('products')">🛍️ All Products</button>
+            <button class="tab" onclick="switchTab('stats')">📊 Statistics</button>
+            <button class="tab" onclick="switchTab('about')">ℹ️ About</button>
+        </div>
+        
+        <!-- Product Analysis Tab -->
+        <div id="analyze" class="content active">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>📋 Product Selection</h3>
+                    <div class="form-group">
+                        <label>Select Product to Analyze</label>
+                        <select id="productSelect" onchange="onProductSelect()">
+                            <option value="">-- Select a Product --</option>
+                        </select>
+                    </div>
+                    
+                    
+                    
+                    <div id="selectedProductInfo" style="display: none;">
+                        <div class="info-box">
+                            <h4>Selected Product: <span id="currentProductName"></span></h4>
+                            <p id="productStatsText">Loading statistics...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="viz-controls">
+                        <button class="btn btn-viz" onclick="analyzeSelectedProduct()">
+                            <span>🔮</span> Analyze Sentiment
+                        </button>
+                        <button class="btn btn-viz" onclick="showVisualization()">
+                            <span>📊</span> Show Visualization
+                        </button>
+                        <button class="btn btn-refresh" onclick="loadAllProducts()">
+                            <span>🔄</span> Refresh Products
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>📈 Analysis Results</h3>
+                    <div id="analysisResult">
+                        <div class="loading">Select a product and click "Analyze Sentiment"</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>📝 Product Reviews</h3>
+                <div id="productReviews" class="reviews-list">
+                    <div class="loading">No product selected</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Visualization Tab -->
+        <div id="visualize" class="content">
+            <div class="card">
+                <h3>📊 Sentiment Visualization</h3>
+                
+                <div class="viz-controls">
+                    <select id="vizProductSelect" onchange="updateVisualization()" style="flex: 2;">
+                        <option value="">-- Select Product for Visualization --</option>
+                    </select>
+                    <button class="btn" onclick="generateBarChart()">
+                        <span>📈</span> Generate Bar Chart
+                    </button>
+                    <button class="btn" onclick="generatePieChart()">
+                        <span>🥧</span> Generate Pie Chart
+                    </button>
+                    <button class="btn btn-refresh" onclick="refreshVisualization()">
+                        <span>🔄</span> Refresh
+                    </button>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="sentimentChart"></canvas>
+                </div>
+                
+                <div id="chartInfo" style="margin-top: 20px; display: none;">
+                    <div class="info-box">
+                        <h4>Chart Information</h4>
+                        <p id="chartDataInfo"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- All Products Tab -->
+        <div id="products" class="content">
+            <div class="card">
+                <h3>🛍️ All Products in Dataset</h3>
+                <div class="viz-controls">
+                    <input type="text" id="allProductsSearch" placeholder="Search products..." 
+                           oninput="searchAllProducts()" style="flex: 1; padding: 12px; border-radius: 8px; border: 2px solid #ddd;">
+                    <button class="btn" onclick="loadAllProducts()">
+                        <span>🔄</span> Refresh List
+                    </button>
+                </div>
+                
+                <div id="productsList" class="reviews-list" style="max-height: 500px;">
+                    <div class="loading">Loading products...</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Statistics Tab -->
+        <div id="stats" class="content">
+            <div class="card">
+                <h3>📊 Overall Statistics</h3>
+                
+                <div class="stats-grid">
+                    <div class="stat-card total">
+                        <div class="stat-label">Total Reviews</div>
+                        <div class="stat-number" id="totalReviewsStat">0</div>
+                    </div>
+                    <div class="stat-card total">
+                        <div class="stat-label">Total Products</div>
+                        <div class="stat-number" id="totalProductsStat">0</div>
+                    </div>
+                    <div class="stat-card positive">
+                        <div class="stat-label">Positive Reviews</div>
+                        <div class="stat-number" id="positiveStat">0</div>
+                        <div id="positivePercentStat">0%</div>
+                    </div>
+                    <div class="stat-card negative">
+                        <div class="stat-label">Negative Reviews</div>
+                        <div class="stat-number" id="negativeStat">0</div>
+                        <div id="negativePercentStat">0%</div>
+                    </div>
+                    <div class="stat-card neutral">
+                        <div class="stat-label">Neutral Reviews</div>
+                        <div class="stat-number" id="neutralStat">0</div>
+                        <div id="neutralPercentStat">0%</div>
+                    </div>
+                    <div class="stat-card total">
+                        <div class="stat-label">Avg Rating</div>
+                        <div class="stat-number" id="avgRatingStat">0</div>
+                        <div>out of 5</div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-refresh" onclick="loadOverallStats()">
+                    <span>🔄</span> Refresh Statistics
+                </button>
+            </div>
+        </div>
+        
+        <!-- About Tab -->
+        <div id="about" class="content">
+            <div class="card">
+                <h3>ℹ️ About This Project</h3>
+                <p>This E-commerce Product Sentiment Analysis system analyzes customer reviews to determine sentiment (Positive, Negative, Neutral) based on ratings (1-5 scale).</p>
+                
+                <div class="warning">
+                    <strong>Note:</strong> Ratings are mapped as follows:<br>
+                    ⭐⭐⭐⭐⭐ (5), ⭐⭐⭐⭐ (4) → Positive<br>
+                    ⭐⭐⭐ (3) → Neutral<br>
+                    ⭐ (1), ⭐⭐ (2) → Negative
+                </div>
+                
+                <h4 style="margin-top: 20px;">Features:</h4>
+                <ul style="margin: 15px 0 15px 30px; line-height: 1.8;">
+                    <li>📋 <strong>Product Selection:</strong> Dropdown list of all products from dataset</li>
+                    <li>🔍 <strong>Sentiment Analysis:</strong> Analyze reviews for selected product</li>
+                    <li>📈 <strong>Visualization:</strong> Bar charts showing sentiment distribution</li>
+                    <li>📊 <strong>Real-time Statistics:</strong> Overall and product-specific stats</li>
+                    <li>🛍️ <strong>Product Browser:</strong> View all products in dataset</li>
+                    <li>📝 <strong>Review Display:</strong> See actual reviews with sentiment labels</li>
+                </ul>
+                
+                <h4 style="margin-top: 20px;">How to Use:</h4>
+                <ol style="margin: 15px 0 15px 30px; line-height: 1.8;">
+                    <li>Go to <strong>Product Analysis</strong> tab</li>
+                    <li>Select a product from dropdown or search</li>
+                    <li>Click <strong>"Analyze Sentiment"</strong> button</li>
+                    <li>View sentiment results and reviews</li>
+                    <li>Click <strong>"Show Visualization"</strong> for charts</li>
+                    <li>Go to <strong>Visualization</strong> tab for more chart options</li>
+                </ol>
+                
+                <h4 style="margin-top: 20px;">Team Contribution:</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 15px 0;">
+                    <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;">
+                        <strong>Data Processing</strong>
+                        <p style="margin-top: 5px; color: #666; font-size: 14px;">Dataset loading and preprocessing</p>
+                    </div>
+                    <div style="background: #f3e5f5; padding: 15px; border-radius: 8px;">
+                        <strong>Sentiment Analysis</strong>
+                        <p style="margin-top: 5px; color: #666; font-size: 14px;">Rating-based sentiment classification</p>
+                    </div>
+                    <div style="background: #e8f5e9; padding: 15px; border-radius: 8px;">
+                        <strong>Visualization</strong>
+                        <p style="margin-top: 5px; color: #666; font-size: 14px;">Charts and data visualization</p>
+                    </div>
+                    <div style="background: #fff3e0; padding: 15px; border-radius: 8px;">
+                        <strong>Frontend Development</strong>
+                        <p style="margin-top: 5px; color: #666; font-size: 14px;">UI design and interaction</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>E-commerce Product Review Sentiment Analysis System | Ratings: 1-5 Scale</p>
+            <p>© 2024 | Project Presentation - Team: Data Cleaning, Modelling, Visualization, Documentation</p>
+        </footer>
+    </div>
+
+    <script>
+        // Configuration
+        const API_URL = 'http://localhost:5000';
+        
+        // Global variables
+        let sentimentChart = null;
+        let allProducts = [];
+        let currentProduct = '';
+        let chartType = 'bar';
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllProducts();
+            loadOverallStats();
+            updateVisualizationProducts();
+        });
+        
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            
+            if (tabName === 'visualize') {
+                setTimeout(() => {
+                    if (currentProduct) {
+                        document.getElementById('vizProductSelect').value = currentProduct;
+                        generateBarChart();
+                    }
+                }, 100);
+            } else if (tabName === 'stats') {
+                loadOverallStats();
+            } else if (tabName === 'products') {
+                displayAllProducts();
+            }
+        }
+        
+        // Load all products from backend
+        async function loadAllProducts() {
+            try {
+                const response = await fetch(`${API_URL}/products`);
+                const data = await response.json();
+                
+                if (data.success && data.products) {
+                    allProducts = data.products.sort();
+                    
+                    // Update product select dropdowns
+                    updateProductSelects();
+                    displayAllProducts();
+                    
+                    console.log(`Loaded ${allProducts.length} products`);
+                }
+            } catch (error) {
+                console.error('Error loading products:', error);
+                showError('productsList', 'Cannot connect to backend. Make sure server is running.');
+            }
+        }
+        
+        // Update product select dropdowns
+        function updateProductSelects() {
+            const analyzeSelect = document.getElementById('productSelect');
+            const vizSelect = document.getElementById('vizProductSelect');
+            
+            // Clear existing options except first
+            while (analyzeSelect.options.length > 1) analyzeSelect.remove(1);
+            while (vizSelect.options.length > 1) vizSelect.remove(1);
+            
+            // Add products to both selects
+            allProducts.forEach(product => {
+                const option1 = document.createElement('option');
+                option1.value = product;
+                option1.textContent = product;
+                analyzeSelect.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = product;
+                option2.textContent = product;
+                vizSelect.appendChild(option2);
+            });
+        }
+        
+        // Update visualization product select
+        function updateVisualizationProducts() {
+            const vizSelect = document.getElementById('vizProductSelect');
+            if (vizSelect.options.length === 1) { // Only has default option
+                allProducts.forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = product;
+                    option.textContent = product;
+                    vizSelect.appendChild(option);
+                });
+            }
+        }
+        
+        // Filter products based on search
+        function filterProducts() {
+            const searchTerm = document.getElementById('productSearch').value.toLowerCase();
+            const select = document.getElementById('productSelect');
+            
+            // Show all options
+            Array.from(select.options).forEach(option => {
+                if (option.value === '') return; // Don't hide default option
+                option.style.display = 'block';
+            });
+            
+            // Hide non-matching options
+            if (searchTerm) {
+                Array.from(select.options).forEach(option => {
+                    if (option.value === '') return;
+                    if (!option.value.toLowerCase().includes(searchTerm)) {
+                        option.style.display = 'none';
+                    }
+                });
+            }
+        }
+        
+        // Search all products
+        function searchAllProducts() {
+            const searchTerm = document.getElementById('allProductsSearch').value.toLowerCase();
+            displayAllProducts(searchTerm);
+        }
+        
+        // Display all products
+        function displayAllProducts(filter = '') {
+            const container = document.getElementById('productsList');
+            
+            if (!allProducts || allProducts.length === 0) {
+                container.innerHTML = '<div class="loading">No products found</div>';
+                return;
+            }
+            
+            let filteredProducts = allProducts;
+            if (filter) {
+                filteredProducts = allProducts.filter(p => p.toLowerCase().includes(filter));
+            }
+            
+            if (filteredProducts.length === 0) {
+                container.innerHTML = '<div class="loading">No products match your search</div>';
+                return;
+            }
+            
+            let html = '';
+            filteredProducts.forEach((product, index) => {
+                html += `
+                    <div class="review-item" style="cursor: pointer;" onclick="selectProductForAnalysis('${product}')">
+                        <div style="background: #3498db; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                            ${index + 1}
+                        </div>
+                        <div class="review-text" style="font-weight: 500;">${product}</div>
+                        <button class="btn" style="padding: 6px 12px; font-size: 12px;" onclick="event.stopPropagation(); analyzeProduct('${product}')">
+                            Analyze
+                        </button>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Product selection handler
+        function onProductSelect() {
+            const select = document.getElementById('productSelect');
+            currentProduct = select.value;
+            
+            if (currentProduct) {
+                document.getElementById('currentProductName').textContent = currentProduct;
+                document.getElementById('selectedProductInfo').style.display = 'block';
+                document.getElementById('productStatsText').textContent = 'Click "Analyze Sentiment" to view statistics';
+                
+                // Update viz select
+                document.getElementById('vizProductSelect').value = currentProduct;
+            } else {
+                document.getElementById('selectedProductInfo').style.display = 'none';
+            }
+        }
+        
+        // Select product for analysis
+        function selectProductForAnalysis(productName) {
+            const select = document.getElementById('productSelect');
+            select.value = productName;
+            onProductSelect();
+            switchTab('analyze');
+        }
+        
+        // Analyze selected product
+        async function analyzeSelectedProduct() {
+            const select = document.getElementById('productSelect');
+            const productName = select.value;
+            
+            if (!productName) {
+                alert('Please select a product first');
+                return;
+            }
+            
+            await analyzeProduct(productName);
+        }
+        
+        // Analyze specific product
+        async function analyzeProduct(productName) {
+            try {
+                // Show loading
+                document.getElementById('analysisResult').innerHTML = '<div class="loading">Analyzing product sentiment...</div>';
+                document.getElementById('productReviews').innerHTML = '<div class="loading">Loading reviews...</div>';
+                
+                // Get product statistics
+                const response = await fetch(`${API_URL}/product_stats?product=${encodeURIComponent(productName)}`);
+                const data = await response.json();
+                
+                if (data.success && data.stats) {
+                    const stats = data.stats;
+                    currentProduct = productName;
+                    
+                    // Update selected product info
+                    document.getElementById('currentProductName').textContent = productName;
+                    document.getElementById('productStatsText').innerHTML = `
+                        Total Reviews: <strong>${stats.total_reviews}</strong> | 
+                        Avg Rating: <strong>${stats.avg_rating}/5</strong> | 
+                        Positive: <strong>${stats.positive}</strong> | 
+                        Negative: <strong>${stats.negative}</strong> | 
+                        Neutral: <strong>${stats.neutral}</strong>
+                    `;
+                    
+                    // Display analysis results
+                    displayAnalysisResults(stats);
+                    
+                    // Display reviews
+                    displayProductReviews(stats.reviews);
+                    
+                    // Update viz select
+                    document.getElementById('vizProductSelect').value = productName;
+                    
+                    // Show success message
+                    setTimeout(() => {
+                        document.getElementById('analysisResult').innerHTML += `
+                            <div style="background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-top: 15px; border: 1px solid #c3e6cb;">
+                                ✅ Analysis complete! Click "Show Visualization" to see charts.
+                            </div>
+                        `;
+                    }, 500);
+                } else {
+                    showError('analysisResult', 'Product not found in dataset');
+                }
+            } catch (error) {
+                console.error('Error analyzing product:', error);
+                showError('analysisResult', 'Cannot connect to backend. Make sure server is running.');
+            }
+        }
+        
+        // Display analysis results
+        function displayAnalysisResults(stats) {
+            const total = stats.total_reviews;
+            const positivePercent = total > 0 ? Math.round((stats.positive / total) * 100) : 0;
+            const negativePercent = total > 0 ? Math.round((stats.negative / total) * 100) : 0;
+            const neutralPercent = total > 0 ? Math.round((stats.neutral / total) * 100) : 0;
+            
+            // Determine overall sentiment
+            let overallSentiment = 'Neutral';
+            let sentimentColor = '#f39c12';
+            
+            if (stats.positive > stats.negative && stats.positive > stats.neutral) {
+                overallSentiment = 'Positive';
+                sentimentColor = '#2ecc71';
+            } else if (stats.negative > stats.positive && stats.negative > stats.neutral) {
+                overallSentiment = 'Negative';
+                sentimentColor = '#e74c3c';
+            }
+            
+            const html = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center; border: 2px solid ${sentimentColor};">
+                        <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Overall Sentiment</div>
+                        <div style="font-size: 2rem; font-weight: bold; color: ${sentimentColor};">${overallSentiment}</div>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Total Reviews</div>
+                        <div style="font-size: 2rem; font-weight: bold; color: #3498db;">${total}</div>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; text-align: center;">
+                        <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Average Rating</div>
+                        <div style="font-size: 2rem; font-weight: bold; color: #f39c12;">${stats.avg_rating}/5</div>
+                    </div>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 15px;">Sentiment Distribution</h4>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span>Positive</span>
+                                <span>${stats.positive} (${positivePercent}%)</span>
+                            </div>
+                            <div style="height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
+                                <div style="height: 100%; background: #2ecc71; width: ${positivePercent}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span>Negative</span>
+                                <span>${stats.negative} (${negativePercent}%)</span>
+                            </div>
+                            <div style="height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
+                                <div style="height: 100%; background: #e74c3c; width: ${negativePercent}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span>Neutral</span>
+                                <span>${stats.neutral} (${neutralPercent}%)</span>
+                            </div>
+                            <div style="height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
+                                <div style="height: 100%; background: #f39c12; width: ${neutralPercent}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('analysisResult').innerHTML = html;
+        }
+        
+        // Display product reviews
+        function displayProductReviews(reviews) {
+            const container = document.getElementById('productReviews');
+            
+            if (!reviews || reviews.length === 0) {
+                container.innerHTML = '<div class="loading">No reviews found for this product</div>';
+                return;
+            }
+            
+            let html = '';
+            reviews.forEach((review, index) => {
+                const sentimentClass = `review-${review.sentiment}`;
+                const ratingStars = '⭐'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                
+                html += `
+                    <div class="review-item">
+                        <div class="review-sentiment ${sentimentClass}">
+                            ${review.sentiment}
+                        </div>
+                        <div class="review-text">
+                            <strong>Review ${index + 1}:</strong> ${review.review_text}<br>
+                            <small style="color: #7f8c8d; margin-top: 5px; display: block;">${review.date}</small>
+                        </div>
+                        <div class="review-rating" title="Rating: ${review.rating}/5">
+                            ${ratingStars}
+                        </div>
+                        <div class="review-category">
+                            ${review.category}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Show visualization tab
+        function showVisualization() {
+            if (!currentProduct) {
+                alert('Please select and analyze a product first');
+                return;
+            }
+            
+            switchTab('visualize');
+            setTimeout(() => {
+                generateBarChart();
+            }, 100);
+        }
+        
+        // Update visualization
+        function updateVisualization() {
+            const select = document.getElementById('vizProductSelect');
+            const productName = select.value;
+            
+            if (productName) {
+                currentProduct = productName;
+                if (chartType === 'bar') {
+                    generateBarChart();
+                } else {
+                    generatePieChart();
+                }
+            }
+        }
+        
+        // Refresh visualization
+        function refreshVisualization() {
+            if (currentProduct) {
+                if (chartType === 'bar') {
+                    generateBarChart();
+                } else {
+                    generatePieChart();
+                }
+            }
+        }
+        
+        // Generate bar chart
+        async function generateBarChart() {
+            chartType = 'bar';
+            const select = document.getElementById('vizProductSelect');
+            const productName = select.value || currentProduct;
+            
+            if (!productName) {
+                alert('Please select a product for visualization');
+                return;
+            }
+            
+            try {
+                // Get product statistics
+                const response = await fetch(`${API_URL}/product_stats?product=${encodeURIComponent(productName)}`);
+                const data = await response.json();
+                
+                if (data.success && data.stats) {
+                    const stats = data.stats;
+                    createBarChart(stats);
+                }
+            } catch (error) {
+                console.error('Error generating chart:', error);
+                showError('sentimentChart', 'Cannot load data for visualization');
+            }
+        }
+        
+        // Generate pie chart
+        async function generatePieChart() {
+            chartType = 'pie';
+            const select = document.getElementById('vizProductSelect');
+            const productName = select.value || currentProduct;
+            
+            if (!productName) {
+                alert('Please select a product for visualization');
+                return;
+            }
+            
+            try {
+                // Get product statistics
+                const response = await fetch(`${API_URL}/product_stats?product=${encodeURIComponent(productName)}`);
+                const data = await response.json();
+                
+                if (data.success && data.stats) {
+                    const stats = data.stats;
+                    createPieChart(stats);
+                }
+            } catch (error) {
+                console.error('Error generating chart:', error);
+                showError('sentimentChart', 'Cannot load data for visualization');
+            }
+        }
+        
+        // Create bar chart
+        function createBarChart(stats) {
+            const ctx = document.getElementById('sentimentChart').getContext('2d');
+            
+            // Destroy existing chart
+            if (sentimentChart) {
+                sentimentChart.destroy();
+            }
+            
+            const labels = ['Positive', 'Negative', 'Neutral'];
+            const data = [stats.positive, stats.negative, stats.neutral];
+            const colors = ['#2ecc71', '#e74c3c', '#f39c12'];
+            
+            sentimentChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Number of Reviews',
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: colors.map(color => color.replace('0.8', '1')),
+                        borderWidth: 2,
+                        borderRadius: 5,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: `Sentiment Analysis for: ${stats.product_name}`,
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                top: 10,
+                                bottom: 30
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = stats.total_reviews;
+                                    const value = context.raw;
+                                    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                    return `${context.label}: ${value} reviews (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Reviews'
+                            },
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Sentiment'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Update chart info
+            updateChartInfo(stats);
+        }
+        
+        // Create pie chart
+        function createPieChart(stats) {
+            const ctx = document.getElementById('sentimentChart').getContext('2d');
+            
+            // Destroy existing chart
+            if (sentimentChart) {
+                sentimentChart.destroy();
+            }
+            
+            const labels = ['Positive', 'Negative', 'Neutral'];
+            const data = [stats.positive, stats.negative, stats.neutral];
+            const colors = ['#2ecc71', '#e74c3c', '#f39c12'];
+            
+            sentimentChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: ['#fff', '#fff', '#fff'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        },
+                        title: {
+                            display: true,
+                            text: `Sentiment Distribution for: ${stats.product_name}`,
+                            font: {
+                                size: 16,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                top: 10,
+                                bottom: 30
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = stats.total_reviews;
+                                    const value = context.raw;
+                                    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                    return `${context.label}: ${value} reviews (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Update chart info
+            updateChartInfo(stats);
+        }
+        
+        // Update chart information
+        function updateChartInfo(stats) {
+            const total = stats.total_reviews;
+            const positivePercent = total > 0 ? Math.round((stats.positive / total) * 100) : 0;
+            const negativePercent = total > 0 ? Math.round((stats.negative / total) * 100) : 0;
+            const neutralPercent = total > 0 ? Math.round((stats.neutral / total) * 100) : 0;
+            
+            document.getElementById('chartInfo').style.display = 'block';
+            document.getElementById('chartDataInfo').innerHTML = `
+                <strong>Product:</strong> ${stats.product_name}<br>
+                <strong>Total Reviews:</strong> ${total}<br>
+                <strong>Positive:</strong> ${stats.positive} (${positivePercent}%)<br>
+                <strong>Negative:</strong> ${stats.negative} (${negativePercent}%)<br>
+                <strong>Neutral:</strong> ${stats.neutral} (${neutralPercent}%)<br>
+                <strong>Average Rating:</strong> ${stats.avg_rating}/5
+            `;
+        }
+        
+        // Load overall statistics
+        async function loadOverallStats() {
+            try {
+                const response = await fetch(`${API_URL}/overall_stats`);
+                const data = await response.json();
+                
+                if (data.success && data.stats) {
+                    const stats = data.stats;
+                    
+                    document.getElementById('totalReviewsStat').textContent = stats.total_reviews;
+                    document.getElementById('totalProductsStat').textContent = stats.total_products;
+                    document.getElementById('positiveStat').textContent = stats.positive;
+                    document.getElementById('negativeStat').textContent = stats.negative;
+                    document.getElementById('neutralStat').textContent = stats.neutral;
+                    document.getElementById('avgRatingStat').textContent = stats.avg_rating;
+                    
+                    document.getElementById('positivePercentStat').textContent = stats.sentiment_percentages.positive + '%';
+                    document.getElementById('negativePercentStat').textContent = stats.sentiment_percentages.negative + '%';
+                    document.getElementById('neutralPercentStat').textContent = stats.sentiment_percentages.neutral + '%';
+                }
+            } catch (error) {
+                console.error('Error loading overall stats:', error);
+            }
+        }
+        
+        // Show error message
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.innerHTML = `<div style="color: #e74c3c; padding: 20px; text-align: center;">❌ ${message}</div>`;
+            }
+        }
+        
+        // Initial function calls
+        setTimeout(() => {
+            if (allProducts.length > 0) {
+                // Select first product by default
+                document.getElementById('productSelect').selectedIndex = 1;
+                onProductSelect();
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

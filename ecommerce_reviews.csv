@@ -1,0 +1,74 @@
+product_name,review_text,rating,category,sentiment,date
+iPhone 15 Pro Max,Review 1: Poor build quality.,2,Electronics,negative,2026-01-29
+iPhone 15 Pro Max,Review 2: Very good value for money.,4,Electronics,positive,2026-01-29
+iPhone 15 Pro Max,"Review 3: Okay product, nothing special.",3,Electronics,neutral,2026-01-29
+iPhone 15 Pro Max,Review 4: Poor build quality.,2,Electronics,negative,2026-01-29
+iPhone 15 Pro Max,Review 5: Poor build quality.,2,Electronics,negative,2026-01-29
+iPhone 15 Pro Max,Review 6: Very good value for money.,4,Electronics,positive,2026-01-29
+iPhone 15 Pro Max,Review 7: Absolutely love it! Best in class.,5,Electronics,positive,2026-01-29
+iPhone 15 Pro Max,Review 8: Satisfactory but could improve.,3,Electronics,neutral,2026-01-29
+iPhone 15 Pro Max,Review 9: Works fine for the price.,4,Electronics,positive,2026-01-29
+Samsung Galaxy S24 Ultra,Review 1: Satisfactory but could improve.,3,Electronics,neutral,2026-01-29
+Samsung Galaxy S24 Ultra,Review 2: Satisfactory but could improve.,3,Electronics,neutral,2026-01-29
+Samsung Galaxy S24 Ultra,Review 3: Works fine for the price.,4,Electronics,positive,2026-01-29
+Samsung Galaxy S24 Ultra,"Review 4: Amazing features, highly recommended!",5,Electronics,positive,2026-01-29
+Samsung Galaxy S24 Ultra,Review 5: Poor build quality.,2,Electronics,negative,2026-01-29
+Samsung Galaxy S24 Ultra,Review 6: Excellent phone! Camera quality is amazing.,5,Electronics,positive,2026-01-29
+Samsung Galaxy S24 Ultra,Review 7: Terrible customer service.,1,Electronics,negative,2026-01-29
+Samsung Galaxy S24 Ultra,Review 8: Perfect for daily use.,5,Electronics,positive,2026-01-29
+Samsung Galaxy S24 Ultra,"Review 9: Worst purchase ever, stopped working in 2 days.",1,Electronics,negative,2026-01-29
+Samsung Galaxy S24 Ultra,Review 10: Terrible customer service.,1,Electronics,negative,2026-01-29
+Sony WH-1000XM5 Headphones,"Review 1: Average performance, could be better.",3,Electronics,neutral,2026-01-29
+Sony WH-1000XM5 Headphones,Review 2: Disappointed with the sound quality.,2,Electronics,negative,2026-01-29
+Sony WH-1000XM5 Headphones,"Review 3: Not what I expected, returning it.",2,Electronics,negative,2026-01-29
+Sony WH-1000XM5 Headphones,Review 4: Good battery life but expensive.,4,Electronics,positive,2026-01-29
+Sony WH-1000XM5 Headphones,"Review 5: Amazing features, highly recommended!",5,Electronics,positive,2026-01-29
+Nike Air Max 270,Review 1: Good battery life but expensive.,4,Footwear,positive,2026-01-29
+Nike Air Max 270,Review 2: Satisfactory but could improve.,3,Footwear,neutral,2026-01-29
+Nike Air Max 270,Review 3: Terrible customer service.,1,Footwear,negative,2026-01-29
+Nike Air Max 270,Review 4: Absolutely love it! Best in class.,5,Footwear,positive,2026-01-29
+Nike Air Max 270,Review 5: Perfect for daily use.,5,Footwear,positive,2026-01-29
+Nike Air Max 270,"Review 6: Amazing features, highly recommended!",5,Footwear,positive,2026-01-29
+Nike Air Max 270,Review 7: Disappointed with the sound quality.,2,Footwear,negative,2026-01-29
+Nike Air Max 270,Review 8: Perfect for daily use.,5,Footwear,positive,2026-01-29
+Nike Air Max 270,Review 9: Poor build quality.,2,Footwear,negative,2026-01-29
+Amazon Echo Dot 5th Gen,Review 1: Satisfactory but could improve.,3,Smart Home,neutral,2026-01-29
+Amazon Echo Dot 5th Gen,"Review 2: Okay product, nothing special.",3,Smart Home,neutral,2026-01-29
+Amazon Echo Dot 5th Gen,Review 3: Very good value for money.,4,Smart Home,positive,2026-01-29
+Amazon Echo Dot 5th Gen,Review 4: Works fine for the price.,4,Smart Home,positive,2026-01-29
+Amazon Echo Dot 5th Gen,Review 5: Perfect for daily use.,5,Smart Home,positive,2026-01-29
+Amazon Echo Dot 5th Gen,"Review 6: Okay product, nothing special.",3,Smart Home,neutral,2026-01-29
+Dell XPS 15 Laptop,Review 1: Very good value for money.,4,Computers,positive,2026-01-29
+Dell XPS 15 Laptop,Review 2: Works fine for the price.,4,Computers,positive,2026-01-29
+Dell XPS 15 Laptop,"Review 3: Average performance, could be better.",3,Computers,neutral,2026-01-29
+Dell XPS 15 Laptop,"Review 4: Amazing features, highly recommended!",5,Computers,positive,2026-01-29
+Dell XPS 15 Laptop,Review 5: Works fine for the price.,4,Computers,positive,2026-01-29
+Dell XPS 15 Laptop,Review 6: Absolutely love it! Best in class.,5,Computers,positive,2026-01-29
+Instant Pot Duo Plus,Review 1: Satisfactory but could improve.,3,Kitchen,neutral,2026-01-29
+Instant Pot Duo Plus,Review 2: Perfect for daily use.,5,Kitchen,positive,2026-01-29
+Instant Pot Duo Plus,Review 3: Terrible customer service.,1,Kitchen,negative,2026-01-29
+Instant Pot Duo Plus,Review 4: Disappointed with the sound quality.,2,Kitchen,negative,2026-01-29
+Instant Pot Duo Plus,Review 5: Absolutely love it! Best in class.,5,Kitchen,positive,2026-01-29
+Kindle Paperwhite,Review 1: Terrible customer service.,1,Electronics,negative,2026-01-29
+Kindle Paperwhite,Review 2: Good battery life but expensive.,4,Electronics,positive,2026-01-29
+Kindle Paperwhite,Review 3: Very good value for money.,4,Electronics,positive,2026-01-29
+Kindle Paperwhite,Review 4: Terrible customer service.,1,Electronics,negative,2026-01-29
+Kindle Paperwhite,Review 5: Perfect for daily use.,5,Electronics,positive,2026-01-29
+Kindle Paperwhite,Review 6: Excellent phone! Camera quality is amazing.,5,Electronics,positive,2026-01-29
+Kindle Paperwhite,"Review 7: Not what I expected, returning it.",2,Electronics,negative,2026-01-29
+Kindle Paperwhite,Review 8: Terrible customer service.,1,Electronics,negative,2026-01-29
+Kindle Paperwhite,"Review 9: Amazing features, highly recommended!",5,Electronics,positive,2026-01-29
+Kindle Paperwhite,Review 10: Absolutely love it! Best in class.,5,Electronics,positive,2026-01-29
+PlayStation 5 Console,"Review 1: Not what I expected, returning it.",2,Gaming,negative,2026-01-29
+PlayStation 5 Console,Review 2: Absolutely love it! Best in class.,5,Gaming,positive,2026-01-29
+PlayStation 5 Console,Review 3: Very good value for money.,4,Gaming,positive,2026-01-29
+PlayStation 5 Console,"Review 4: Okay product, nothing special.",3,Gaming,neutral,2026-01-29
+PlayStation 5 Console,"Review 5: Worst purchase ever, stopped working in 2 days.",1,Gaming,negative,2026-01-29
+Bose QuietComfort Earbuds,"Review 1: Okay product, nothing special.",3,Electronics,neutral,2026-01-29
+Bose QuietComfort Earbuds,Review 2: Excellent phone! Camera quality is amazing.,5,Electronics,positive,2026-01-29
+Bose QuietComfort Earbuds,"Review 3: Not what I expected, returning it.",2,Electronics,negative,2026-01-29
+Bose QuietComfort Earbuds,Review 4: Disappointed with the sound quality.,2,Electronics,negative,2026-01-29
+Bose QuietComfort Earbuds,Review 5: Disappointed with the sound quality.,2,Electronics,negative,2026-01-29
+Bose QuietComfort Earbuds,Review 6: Terrible customer service.,1,Electronics,negative,2026-01-29
+Bose QuietComfort Earbuds,Review 7: Absolutely love it! Best in class.,5,Electronics,positive,2026-01-29
+Bose QuietComfort Earbuds,Review 8: Good battery life but expensive.,4,Electronics,positive,2026-01-29
