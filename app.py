@@ -474,7 +474,7 @@ class EcommerceHandler(BaseHTTPRequestHandler):
             self.send_error(404, 'Endpoint not found')
 
 def run_server(port=5000):
-    server = HTTPServer(('localhost', port), EcommerceHandler)
+    server = HTTPServer(('0.0.0.0', port), EcommerceHandler)
     print(f"🚀 E-commerce Sentiment Analysis Server")
     print(f"🌐 Running on: http://localhost:{port}")
     print(f"📊 Dataset: {len(EcommerceHandler.analyzer.dataset)} reviews")
