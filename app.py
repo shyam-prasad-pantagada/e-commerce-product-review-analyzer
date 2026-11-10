@@ -12,18 +12,8 @@ from datetime import datetime
 class EcommerceSentimentAnalyzer:
     def __init__(self, dataset_path='ecommerce_reviews.csv'):
         # Initialize word lists for sentiment analysis
-        self.positive_words = {
-            'good', 'excellent', 'amazing', 'great', 'happy', 'love', 'best', 'perfect',
-            'recommend', 'awesome', 'fantastic', 'wonderful', 'outstanding', 'brilliant',
-            'superb', 'nice', 'satisfied', 'pleased', 'delighted', 'impressed', 'worth',
-            'exceeded', 'perfectly', 'perfect', 'lovely', 'enjoyed', 'pleasure', 'excellent'
-        }
-        self.negative_words = {
-            'bad', 'poor', 'terrible', 'worst', 'disappointed', 'waste', 'horrible',
-            'awful', 'broken', 'cheap', 'useless', 'junk', 'trash', 'garbage',
-            'rubbish', 'dislike', 'hate', 'pathetic', 'fake', 'scam', 'regret',
-            'return', 'refund', 'damaged', 'defective', 'slow', 'missing', 'broken'
-        }
+        self.positive_words = {'good', 'excellent', 'amazing', 'great', 'happy', 'love', 'best', 'perfect', 'recommend', 'awesome', 'fantastic', 'wonderful', 'outstanding', 'brilliant', 'superb', 'nice', 'satisfied', 'pleased', 'delighted', 'impressed', 'worth', 'exceeded', 'perfectly', 'perfect', 'lovely', 'enjoyed', 'pleasure', 'excellent'}
+        self.negative_words = {'bad', 'poor', 'terrible', 'worst', 'disappointed', 'waste', 'horrible', 'awful', 'broken', 'cheap', 'useless', 'junk', 'trash', 'garbage', 'rubbish', 'dislike', 'hate', 'pathetic', 'fake', 'scam', 'regret', 'return', 'refund', 'damaged', 'defective', 'slow', 'missing', 'broken'}
         self.neutral_words = {'okay', 'average', 'normal', 'fine', 'acceptable', 'mediocre', 'standard'}
         
         # Load dataset
@@ -37,13 +27,12 @@ class EcommerceSentimentAnalyzer:
         else:
             self.create_sample_dataset()
             print("📝 Created sample dataset")
-    
+
     def load_dataset(self, dataset_path):
         """Load e-commerce review dataset"""
         try:
             if dataset_path.endswith('.csv'):
                 df = pd.read_csv(dataset_path)
-                
                 # Standardize column names
                 column_map = {}
                 for col in df.columns:
@@ -64,19 +53,16 @@ class EcommerceSentimentAnalyzer:
                 if 'product_name' not in df.columns:
                     if len(df.columns) > 0:
                         df['product_name'] = df.iloc[:, 0]
-                
                 if 'review_text' not in df.columns:
                     if len(df.columns) > 1:
                         df['review_text'] = df.iloc[:, 1]
                     else:
                         df['review_text'] = 'No review text available'
-                
                 if 'rating' not in df.columns:
                     df['rating'] = 3  # Default rating
-                
                 if 'category' not in df.columns:
                     df['category'] = 'General'
-                
+
                 # Convert to records
                 for _, row in df.iterrows():
                     try:
@@ -97,14 +83,13 @@ class EcommerceSentimentAnalyzer:
                         
                         # If rating and text sentiment disagree, use weighted average
                         if sentiment != text_sentiment:
-                            # Give more weight to rating (60%) than text (40%)
                             if rating >= 4 or (rating == 3 and text_sentiment == 'neutral'):
                                 sentiment = text_sentiment if random.random() < 0.4 else sentiment
                         
                         product_name = str(row.get('product_name', 'Unknown Product')).strip()
                         if not product_name:
                             product_name = 'Unknown Product'
-                        
+                            
                         review = {
                             'product_name': product_name,
                             'review_text': review_text,
@@ -119,7 +104,7 @@ class EcommerceSentimentAnalyzer:
                         # Add to product list if not already there
                         if product_name not in self.products:
                             self.products.append(product_name)
-                        
+                            
                         # Group reviews by product
                         if product_name not in self.product_reviews:
                             self.product_reviews[product_name] = []
@@ -128,25 +113,21 @@ class EcommerceSentimentAnalyzer:
                     except Exception as e:
                         print(f"Error processing row: {e}")
                         continue
-                
+                        
                 print(f"✅ Successfully loaded {len(self.dataset)} reviews")
                 print(f"✅ Found {len(self.products)} unique products")
-                
             else:
                 print(f"❌ Unsupported file format: {dataset_path}")
                 self.create_sample_dataset()
-                
         except Exception as e:
             print(f"❌ Error loading dataset: {e}")
             self.create_sample_dataset()
-    
+
     def parse_rating(self, rating):
         """Parse rating to ensure it's between 1-5"""
         try:
-            # Convert to float first
             if isinstance(rating, str):
                 rating = rating.strip()
-                # Extract first number from string
                 match = re.search(r'(\d+(\.\d+)?)', rating)
                 if match:
                     rating = float(match.group(1))
@@ -155,34 +136,19 @@ class EcommerceSentimentAnalyzer:
             else:
                 rating = float(rating)
             
-            # Ensure rating is between 1-5
             rating = max(1.0, min(5.0, rating))
-            
-            # Round to nearest integer for sentiment classification
             return int(round(rating))
-            
         except:
             return 3  # Default to neutral
-    
+
     def create_sample_dataset(self):
         """Create sample dataset with ratings 1-5"""
         sample_products = [
-            "iPhone 15 Pro Max",
-            "Samsung Galaxy S24 Ultra",
-            "Sony WH-1000XM5 Headphones",
-            "Nike Air Max 270",
-            "Amazon Echo Dot 5th Gen",
-            "Dell XPS 15 Laptop",
-            "Instant Pot Duo Plus",
-            "Kindle Paperwhite",
-            "PlayStation 5 Console",
-            "Bose QuietComfort Earbuds"
+            "iPhone 15 Pro Max", "Samsung Galaxy S24 Ultra", "Sony WH-1000XM5 Headphones",
+            "Nike Air Max 270", "Amazon Echo Dot 5th Gen", "Dell XPS 15 Laptop",
+            "Instant Pot Duo Plus", "Kindle Paperwhite", "PlayStation 5 Console", "Bose QuietComfort Earbuds"
         ]
-        
-        sample_categories = ["Electronics", "Electronics", "Electronics", "Footwear", 
-                           "Smart Home", "Computers", "Kitchen", "Electronics", 
-                           "Gaming", "Electronics"]
-        
+        sample_categories = ["Electronics", "Electronics", "Electronics", "Footwear", "Smart Home", "Computers", "Kitchen", "Electronics", "Gaming", "Electronics"]
         sample_reviews = [
             ("Excellent phone! Camera quality is amazing.", 5),
             ("Good battery life but expensive.", 4),
@@ -203,20 +169,17 @@ class EcommerceSentimentAnalyzer:
         
         for product_idx, product in enumerate(sample_products):
             category = sample_categories[product_idx % len(sample_categories)]
-            
-            # Create 5-10 reviews per product
             for i in range(random.randint(5, 10)):
                 review_text, rating = random.choice(sample_reviews)
                 rating = self.parse_rating(rating)
                 
-                # Determine sentiment from rating
                 if rating >= 4:
                     sentiment = 'positive'
                 elif rating == 3:
                     sentiment = 'neutral'
                 else:
                     sentiment = 'negative'
-                
+                    
                 review = {
                     'product_name': product,
                     'review_text': f"Review {i+1}: {review_text}",
@@ -225,47 +188,39 @@ class EcommerceSentimentAnalyzer:
                     'sentiment': sentiment,
                     'date': datetime.now().strftime('%Y-%m-%d')
                 }
-                
                 self.dataset.append(review)
-                
                 if product not in self.products:
                     self.products.append(product)
-                
                 if product not in self.product_reviews:
                     self.product_reviews[product] = []
                 self.product_reviews[product].append(review)
-        
-        # Save sample dataset to CSV
+                
         self.save_sample_dataset()
-    
+
     def save_sample_dataset(self):
         """Save the sample dataset to CSV for future use"""
         df = pd.DataFrame(self.dataset)
         df.to_csv('ecommerce_reviews.csv', index=False)
         print("💾 Sample dataset saved to 'ecommerce_reviews.csv'")
-    
+
     def analyze_sentiment(self, text):
         """Analyze sentiment from text (fallback method)"""
         if not isinstance(text, str):
             return 'neutral'
-        
         text_lower = text.lower()
         pos_count = sum(1 for word in self.positive_words if word in text_lower)
         neg_count = sum(1 for word in self.negative_words if word in text_lower)
         neu_count = sum(1 for word in self.neutral_words if word in text_lower)
         
-        total = pos_count + neg_count + neu_count
-        
-        if total == 0:
+        if pos_count == 0 and neg_count == 0 and neu_count == 0:
             return 'neutral'
-        
         if pos_count > neg_count and pos_count > neu_count:
             return 'positive'
         elif neg_count > pos_count and neg_count > neu_count:
             return 'negative'
         else:
             return 'neutral'
-    
+
     def get_product_sentiment_stats(self, product_name):
         """Get sentiment statistics for a specific product"""
         if product_name not in self.product_reviews:
@@ -279,14 +234,11 @@ class EcommerceSentimentAnalyzer:
                 'sentiment_distribution': {'positive': 0, 'negative': 0, 'neutral': 0},
                 'reviews': []
             }
-        
         reviews = self.product_reviews[product_name]
         total = len(reviews)
-        
         positive = sum(1 for r in reviews if r['sentiment'] == 'positive')
         negative = sum(1 for r in reviews if r['sentiment'] == 'negative')
         neutral = sum(1 for r in reviews if r['sentiment'] == 'neutral')
-        
         avg_rating = sum(r['rating'] for r in reviews) / total if total > 0 else 0
         
         return {
@@ -296,25 +248,20 @@ class EcommerceSentimentAnalyzer:
             'negative': negative,
             'neutral': neutral,
             'avg_rating': round(avg_rating, 2),
-            'sentiment_distribution': {
-                'positive': positive,
-                'negative': negative,
-                'neutral': neutral
-            },
-            'reviews': reviews[:20]  # Return first 20 reviews
+            'sentiment_distribution': {'positive': positive, 'negative': negative, 'neutral': neutral},
+            'reviews': reviews[:20]
         }
-    
+
     def get_all_products(self):
         """Get list of all unique products"""
         return sorted(self.products)
-    
+
     def get_overall_stats(self):
         """Get overall statistics"""
         total_reviews = len(self.dataset)
         positive = sum(1 for r in self.dataset if r['sentiment'] == 'positive')
         negative = sum(1 for r in self.dataset if r['sentiment'] == 'negative')
         neutral = sum(1 for r in self.dataset if r['sentiment'] == 'neutral')
-        
         avg_rating = sum(r['rating'] for r in self.dataset) / total_reviews if total_reviews > 0 else 0
         
         return {
@@ -331,17 +278,17 @@ class EcommerceSentimentAnalyzer:
             }
         }
 
-# HTTP Server
+# HTTP Server class
 class EcommerceHandler(BaseHTTPRequestHandler):
     analyzer = EcommerceSentimentAnalyzer()
-    
+
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
-    
+
     def do_GET(self):
         parsed = urlparse(self.path)
         path = parsed.path
@@ -353,35 +300,23 @@ class EcommerceHandler(BaseHTTPRequestHandler):
                 self.send_header('Content-Type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
-                
                 products = self.analyzer.get_all_products()
-                response = {
-                    'success': True,
-                    'products': products,
-                    'count': len(products)
-                }
+                response = {'success': True, 'products': products, 'count': len(products)}
                 self.wfile.write(json.dumps(response).encode())
                 
             elif path == '/product_stats':
                 # Get stats for specific product
                 query = parse_qs(parsed.query)
                 product_name = query.get('product', [''])[0]
-                
                 if not product_name:
                     self.send_error(400, 'Product name is required')
                     return
-                
                 stats = self.analyzer.get_product_sentiment_stats(product_name)
-                
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
-                
-                response = {
-                    'success': True,
-                    'stats': stats
-                }
+                response = {'success': True, 'stats': stats}
                 self.wfile.write(json.dumps(response).encode())
                 
             elif path == '/overall_stats':
@@ -390,12 +325,8 @@ class EcommerceHandler(BaseHTTPRequestHandler):
                 self.send_header('Content-Type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
-                
                 stats = self.analyzer.get_overall_stats()
-                response = {
-                    'success': True,
-                    'stats': stats
-                }
+                response = {'success': True, 'stats': stats}
                 self.wfile.write(json.dumps(response).encode())
                 
             elif path == '/dataset_info':
@@ -404,7 +335,6 @@ class EcommerceHandler(BaseHTTPRequestHandler):
                 self.send_header('Content-Type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
-                
                 response = {
                     'success': True,
                     'total_reviews': len(self.analyzer.dataset),
@@ -414,62 +344,47 @@ class EcommerceHandler(BaseHTTPRequestHandler):
                 self.wfile.write(json.dumps(response).encode())
                 
             else:
-                # Default response
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                
-                response = {
-                    'success': True,
-                    'message': 'E-commerce Sentiment Analysis API',
-                    'endpoints': [
-                        '/products - Get all products',
-                        '/product_stats?product=NAME - Get product statistics',
-                        '/overall_stats - Get overall statistics',
-                        '/dataset_info - Get dataset information'
-                    ]
-                }
-                self.wfile.write(json.dumps(response).encode())
-                
+                # Serve index.html when visiting the root URL /
+                try:
+                    with open('index.html', 'rb') as f:
+                        html_content = f.read()
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'text/html')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.end_headers()
+                    self.wfile.write(html_content)
+                except FileNotFoundError:
+                    # Fallback if index.html is missing in the repository
+                    self.send_response(404)
+                    self.send_header('Content-Type', 'text/plain')
+                    self.end_headers()
+                    self.wfile.write(b"index.html not found in project directory")
+                    
         except Exception as e:
             self.send_error(500, f'Server error: {str(e)}')
-    
+
     def do_POST(self):
         parsed = urlparse(self.path)
-        
         if parsed.path == '/analyze_product':
-            # Analyze sentiment for a product
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            
             try:
                 data = json.loads(post_data.decode())
                 product_name = data.get('product_name', '')
-                
                 if not product_name:
                     self.send_error(400, 'Product name is required')
                     return
-                
                 stats = self.analyzer.get_product_sentiment_stats(product_name)
-                
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
-                
-                response = {
-                    'success': True,
-                    'product_name': product_name,
-                    'stats': stats
-                }
+                response = {'success': True, 'product_name': product_name, 'stats': stats}
                 self.wfile.write(json.dumps(response).encode())
-                
             except json.JSONDecodeError:
                 self.send_error(400, 'Invalid JSON data')
             except Exception as e:
                 self.send_error(500, f'Server error: {str(e)}')
-        
         else:
             self.send_error(404, 'Endpoint not found')
 
@@ -487,7 +402,6 @@ def run_server(port=5000):
     print(f"  POST http://localhost:{port}/analyze_product")
     print("=" * 50)
     print("🛑 Press Ctrl+C to stop the server")
-    
     try:
         server.serve_forever()
     except KeyboardInterrupt:
@@ -495,4 +409,5 @@ def run_server(port=5000):
         server.server_close()
 
 if __name__ == '__main__':
-    run_server()
+    port = int(os.environ.get('PORT', 5000))
+    run_server(port)
